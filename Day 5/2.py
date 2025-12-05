@@ -11,12 +11,14 @@ with open(filepath) as f:
         i += 1
         line = data[i].strip()
     seen_id_range = []
+    valid_ranges.sort()
+    merged = []
+
     for start, end in valid_ranges:
-        for seen_range in seen_id_range:
-            if start >= seen_range[0] and end <= seen_range[1]:
-                seen_id_range = [min(seen_id_range[0], start), max(seen_id_range[1], end+1)]
-            else:
-                seen_id_range.append(start, end)
-    answer = seen_id_range[1] - seen_id_range[0] + 1
-        
+        if not merged or start > merged[-1][1] + 1:
+            merged.append([start, end])
+        else:
+            merged[-1][1] = max(merged[-1][1], end)
+
+    answer = sum(end - start + 1 for start, end in merged)
     print(answer)
