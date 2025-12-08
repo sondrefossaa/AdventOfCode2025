@@ -1,7 +1,11 @@
 import re
 import math
+import os
 
-filepath = "./data.txt"
+# Get the directory where the script is located
+script_dir = os.path.dirname(os.path.abspath(__file__))
+filepath = os.path.join(script_dir, 'data.txt')
+
 file = open(filepath)
 data = file.readlines()
 
@@ -27,7 +31,7 @@ for i in range(len(matches)):
     if operator == "*": total_sum += math.prod(numbers)
     if operator == "+": total_sum += sum(numbers)
     
-
+print(total_sum)
 
     
     
