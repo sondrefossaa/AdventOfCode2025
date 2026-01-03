@@ -17,8 +17,8 @@ int data_size = 0;
 machine *machines[163];     
 const char *file = "input.txt";
 
-getFewestPresses(machine curr_machine){
-    return;
+int getFewestPresses(machine curr_machine){
+    return 1;
 }
 
 int getAnswer(){
