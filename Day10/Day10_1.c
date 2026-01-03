@@ -6,15 +6,15 @@
 #define MAX_JOLTAGE 100
 
 typedef struct {
-    char *switches;          // String inside []
-    char **buttons;          // Array of strings inside ()
-    int *joltage;            // Array of integers inside {}
+    char *switches;       
+    char **buttons;       
+    int *joltage;           
     int button_count;
     int joltage_count;
 } machine;
 
 int data_size = 0;
-machine *machines[163];      // Array of machine pointers
+machine *machines[163];     
 const char *file = "input.txt";
 
 getFewestPresses(machine curr_machine){
@@ -33,13 +33,13 @@ int getAnswer(){
     return sum;
 }
 int main(void) {
-    FILE *input = fopen(file, "r");  // Use double quotes, not single quotes
+    FILE *input = fopen(file, "r");
     if (input == NULL) {
         printf("Error opening file %s\n", file);
         return 1;
     }
     
-    char buffer[256];  // Not char *buffer[256] - that's array of pointers!
+    char buffer[256];
     
     while (fgets(buffer, sizeof(buffer), input) != NULL) {
         // Remove newline character
@@ -58,15 +58,13 @@ int main(void) {
         machines[data_size]->joltage_count = 0;
         
         // Tokenize by space
-        char *token = strtok(buffer, " ");  // Double quotes, not single
+        char *token = strtok(buffer, " ");
         while (token != NULL) {
             // Check first character to determine type
             char first_char = token[0];
             
             switch (first_char) {
                 case '[': {
-                    // Switches - remove brackets
-                    // token looks like "[...#.]"
                     int len = strlen(token);
                     if (len > 2 && token[len-1] == ']') {
                         // Allocate memory and copy without brackets
@@ -78,8 +76,6 @@ int main(void) {
                 }
                 
                 case '(': {
-                    // Buttons - store the token as is, or parse numbers
-                    // token looks like "(0,2,3,4)" or "(2,3)"
                     if (machines[data_size]->button_count < MAX_BUTTONS) {
                         machines[data_size]->buttons[machines[data_size]->button_count] = strdup(token);
                         machines[data_size]->button_count++;
@@ -137,7 +133,7 @@ int main(void) {
         }
         printf("\n\n");
     }
-    printf("Answer is: %d", getAnswer())
+    printf("Answer is: %d", getAnswer());
     // Cleanup
     for (int i = 0; i < data_size; i++) {
         free(machines[i]->switches);
