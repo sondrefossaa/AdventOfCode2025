@@ -10,6 +10,9 @@ int data_size = 0;
 typedef struct position {
   int x, y;
 } position;
+
+int *seenYpos = NULL;
+
 position *positions[MAX_LEN];
 position *positions_sorted_x[MAX_LEN];
 position *positions_sorted_y[MAX_LEN];
@@ -47,28 +50,54 @@ int findIndex(int value, position **posArr, bool search_x) {
   }
   return left;
 }
-long getArea(position first, position second) {
-  int64_t width = llabs(first.x - second.x) + 1;
 
-  int64_t height = llabs(first.y - second.y) + 1;
-  return width * height;
-}
-
-bool checkPoint(position point, int lock, int direction, int clamp){
-
-}
-
-bool checkGreen(position p1,position p2){
+bool checkGreen(position p1, position p2) {
   // check the y dir of the first point
-  checkPoint(p1, 1, p2.y);
+  position new = {p1.x + 1, p1.y + 1};
+  bool fTest = false;
+  for (int i = 0; i < data_size; i++) {
+    if (positions[i]->x == p1.x and positions[i]->y == p2.y) {
+      fTest = true;
+      break;
+    }
+  }
+  if (!fTest) {
+    return false;
+  }
+  // Raycast
+  // For each x pos thats bigger than p1 x check if it has a point with same x
+  // and bigger or same y as p2.y
+  if (seenYpos == NULL) {
+    seenYpos = (int *)calloc(data_size, sizeof(int));
+  } else {
+    memset(seenYpos, 0, data_size * sizeof(int));
+  }
 
+  int rayCastCol = 0;
+  for (int i = 0; i < data_size; i++) {
+    if (positions[i]->x > p1.x) {
+      bool foundAbove = false;
+      for (int j = 0; j < data_size; j++) {
+        if (positions[j]->y >= p2.y and positions[j]->x == positions[i]->x) {
+          if (!seenYpos[j]) {
+            seenYpos[j] = 1;
+            foundAbove = true;
+          }
+        }
+      }
+      if (foundAbove) {
+        rayCastCol++;
+      }
+    }
+  }
+  return rayCastCol % 2 == 0;
 }
 int64_t getBiggestArea() {
   int64_t biggest_area = 0;
   for (int i = 0; i < data_size; i++) {
     for (int j = 0; j < data_size; j++) {
       int64_t area = getArea(*positions[i], *positions[j]);
-      if (area > biggest_area) {
+      if (area > biggest_area and checkGreen(*positions[i], *positions[j])) {
         biggest_area = area;
       }
     }
@@ -108,5 +137,14 @@ int main(void) {
   qsort(positions_sorted_y, data_size, sizeof(position *), compare_y);
   int64_t result = getBiggestArea();
   printf("Biggest area between red tiles: %" PRId64 "\n", result);
-  return 1;
+
+  // Cleanup
+  if (seenYpos != NULL) {
+    free(seenYpos);
+  }
+  for (int i = 0; i < data_size; i++) {
+    free(positions[i]);
+  }
+
+  return 0;
 }
